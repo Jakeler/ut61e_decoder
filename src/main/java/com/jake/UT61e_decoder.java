@@ -1,8 +1,8 @@
-package com.example;
+package com.jake;
 
 
 /**
- * Created by jan on 11.08.16.
+ * Created by Jake on 11.08.16.
  */
 public class UT61e_decoder {
     public byte[] raw;
