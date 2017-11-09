@@ -2,7 +2,7 @@ package com.jake;
 
 
 /**
- * Created by Jake on 11.08.16.
+ * Class that holds one dataset/measurement from a Uni-T UT61E Multimeter
  */
 public class UT61e_decoder {
     public byte[] raw;
@@ -67,6 +67,11 @@ public class UT61e_decoder {
 
     }
 
+    /**
+     * Decode the input data an set all data fields in the object
+     * @param input 14 bytes (one measurement) from the multimeter serial connection
+     * @return true if parsing was successful, false otherwise
+     */
     public boolean parse(byte[] input) {
 
         if (!checkLength(input)) {
@@ -88,6 +93,10 @@ public class UT61e_decoder {
         return true;
     }
 
+    /**
+     * Check the whole input data against the parity bit in each byte and fills the raw field
+     * @return true, if input is fine
+     */
     private boolean checkParity(byte[] input, boolean odd) {
         boolean correct = true;
         raw = new byte[input.length];
@@ -103,11 +112,17 @@ public class UT61e_decoder {
         return correct;
     }
 
+    /**
+     * @return true, if input size is correct (14 bytes)
+     */
     private boolean checkLength(byte[] input) {
         return input.length == 14;
     }
 
 
+    /**
+     * Set the mode, unit and unit string field, taking all relevant bytes into account
+     */
     private void set_mode() {
         mode = raw[6] & 0x0F;
         if (isFreq()) mode = MODE_FREQ;
@@ -116,11 +131,17 @@ public class UT61e_decoder {
         unit_str = units[mode][unit];
     }
 
+    /**
+     * Set the type and info half byte
+     */
     private void set_info() {
         type = raw[10] & 0x0F;
         info = raw[7] & 0x0F;
     }
 
+    /**
+     * Calculate the measurement value from the raw data
+     */
     private void calcValue() {
         int factor = 10000;
         for (int i = 1; i<=5; i++) {
@@ -131,30 +152,51 @@ public class UT61e_decoder {
         if (isNeg()) value *= -1;
     }
 
+    /**
+     * @return true, if the measured value is negative
+     */
     public boolean isNeg() {
         return (info & NEG) == NEG;
     }
 
+    /**
+     * @return true, if the multimeter is overloaded (out of range)
+     */
     public boolean isOL() {
         return (info & OL) == OL;
     }
 
+    /**
+     * @return true, if the multimeter is underloaded (out of range)
+     */
     public boolean isUL() {
         return (raw[9] & UL) == UL;
     }
 
+    /**
+     * @return true, if it is in frequency mode (through yellow push button)
+     */
     public boolean isFreq() {
         return (type & HZ) == HZ;
     }
 
+    /**
+     * @return true, if it is in duty cycle mode (through yellow push button)
+     */
     public boolean isDuty() {
         return (info & MODE_DUTY) == MODE_DUTY || info == MODE_DUTY;
     }
 
+    /**
+     * @return true, if it is set to DC (voltage and current mode)
+     */
     public boolean isDC() {
         return (type & DC) == DC;
     }
 
+    /**
+     * @return true, if it is set to AC (voltage and current mode)
+     */
     public boolean isAC() {
         return (type & AC) == AC;
     }
@@ -164,6 +206,9 @@ public class UT61e_decoder {
         return String.format("%.4f", value) + " " + unit_str;
     }
 
+    /**
+     * @return CSV compatible line string
+     */
     public String toCSVString() {
         String seperator = ";";
         String out = String.format("%.4f", value) + seperator;
@@ -173,5 +218,8 @@ public class UT61e_decoder {
         return out;
     }
 
+    /**
+     * First line in a CSV file that describes the columns
+     */
     public static String csvHeader = "Value;Unit;Type;Overloaded";
 }
