@@ -5,9 +5,10 @@ package com.jake;
  * Class that holds one dataset/measurement from a Uni-T UT61E Multimeter
  */
 public class UT61e_decoder {
-    public byte[] raw;
-    public double value;
-    public int mode;
+
+    private byte[] raw;
+    private double value;
+    private int mode;
     private int unit, type, info;
     public String unit_str;
 
@@ -222,4 +223,26 @@ public class UT61e_decoder {
      * First line in a CSV file that describes the columns
      */
     public static String csvHeader = "Value;Unit;Type;Overloaded";
+
+
+    /**
+     * @return byte array from input
+     */
+    public byte[] getRaw() {
+        return raw;
+    }
+
+    /**
+     * @return the measured value
+     */
+    public double getValue() {
+        return value;
+    }
+
+    /**
+     * @return the mode (measurement type), can be compared to the MODE_XYZ constants
+     */
+    public int getMode() {
+        return mode;
+    }
 }
