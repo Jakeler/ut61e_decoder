@@ -1,13 +1,15 @@
 package com.jake;
 
 
+import java.util.Locale;
+
 /**
  * Class that holds one dataset/measurement from a Uni-T UT61E Multimeter
  */
 public class UT61e_decoder {
 
     private byte[] raw;
-    private double value;
+    public double value;
     private int mode;
     private int unit, type, info;
     public String unit_str;
@@ -204,7 +206,7 @@ public class UT61e_decoder {
 
     @Override
     public String toString() {
-        return String.format("%.4f", value) + " " + unit_str;
+        return String.format(Locale.US,"%.4f", value) + " " + unit_str;
     }
 
     /**
@@ -212,7 +214,7 @@ public class UT61e_decoder {
      */
     public String toCSVString() {
         String seperator = ";";
-        String out = String.format("%.4f", value) + seperator;
+        String out = String.format(Locale.US,"%.4f", value) + seperator;
         out += unit_str + seperator;
         out += (isDC()? "DC":"") + (isAC()? "DC":"")+ (isFreq()? "Freq.":"")+ (isDuty()? "Duty":"") + seperator;
         out += (isOL()? "OL":"") + (isUL()? "UL":"");
